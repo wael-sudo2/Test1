@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: test1pw
+      MYSQL_DATABASE: extracted_data
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+
+  app:
+    build: .
+    depends_on:
+      - mysql
+    volumes:
+      - ./DataIngestion.py:/app/DataIngestion.py
+      - ./Crawler.py:/app/Crawler.py
+      - ./database_schema.sql:/app/database_schema.sql
+      - ./data.json:/app/data.json
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=test1pw
+      - MYSQL_DB=extracted_data
